@@ -101,15 +101,42 @@ Metrics were computed programmatically using `evaluate.py` against an annotated 
 
 ## 🚀 Local Execution & Deployment Guide
 
-### 1. Local Web App Execution
+### 1. Environment Setup & Installation
+
+#### Option A: Fast Setup with `uv` (Recommended)
+If you have [Astral's `uv`](https://github.com/astral-sh/uv) installed:
+```bash
+# Create virtual environment & install dependencies instantly
+uv venv
+uv pip install -r requirements.txt
+uv run python -m spacy download en_core_web_sm
+```
+
+#### Option B: Standard `pip` Setup
+```bash
+# Create virtual environment & install dependencies
+python -m venv venv
+.\venv\Scripts\python.exe -m pip install -r requirements.txt
+.\venv\Scripts\python.exe -m spacy download en_core_web_sm
+```
+
+### 2. Local Web App Execution
 To launch the live FastAPI web dashboard locally:
 ```bash
+# Using uv
+uv run python app.py
+
+# Or using standard python
 .\venv\Scripts\python.exe app.py
 ```
 Open `http://localhost:10000` in your browser to access the Drag & Drop Web UI, or visit `http://localhost:10000/docs` for interactive Swagger API documentation.
 
-### 2. CLI Execution
+### 3. CLI Execution
 ```bash
+# Using uv
+uv run python redact.py "Red Herring Prospectus.docx" "Redacted_Output_Final_Final.docx"
+
+# Or using standard python
 .\venv\Scripts\python.exe redact.py "Red Herring Prospectus.docx" "Redacted_Output_Final_Final.docx"
 ```
 
