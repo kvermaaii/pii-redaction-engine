@@ -6,6 +6,19 @@ from presidio_analyzer.nlp_engine import NlpEngineProvider
 from presidio_anonymizer import AnonymizerEngine
 from presidio_anonymizer.entities import OperatorConfig
 
+ALLOW_LIST = [
+    "E-MAIL", "EMAIL", "E-Mail", "Email", "Email:", "E-Mail:", "E-MAIL AND TELEPHONE",
+    "TELEPHONE", "Telephone", "Telephone:", "PHONE", "Phone", "Phone:",
+    "FAX", "Fax", "Fax:", "WEBSITE", "Website", "Website:",
+    "CONTACT PERSON", "Contact Person", "REGISTERED OFFICE", "Registered Office",
+    "CORPORATE OFFICE", "Corporate Office", "OUR PROMOTERS", "PROMOTERS", "Promoters",
+    "DETAILS OF THE OFFER TO PUBLIC", "TYPE", "SIZE OF THE FRESH ISSUE",
+    "SIZE OF THE OFFER FOR SALE", "TOTAL OFFER SIZE", "ELIGIBILITY",
+    "RESERVATION AMONG QIBs, NIIs AND RIIs", "QIBs", "NIIs", "RIIs",
+    "Ticket", "Order", "Application", "Section", "Clause", "Table",
+    "Red Herring Prospectus", "Prospectus", "Draft Red Herring Prospectus"
+]
+
 def setup_engines(score_threshold=0.4):
     """Initializes the Presidio Analyzer with custom recognizers, Anonymizer, and Faker."""
     configuration = {
@@ -16,7 +29,6 @@ def setup_engines(score_threshold=0.4):
     nlp_engine = provider.create_engine()
     analyzer = AnalyzerEngine(nlp_engine=nlp_engine, supported_languages=["en"])
     
-    # Custom Recognizers to improve Recall & Precision on domain-specific PII
     pan_pattern = Pattern(name="pan_pattern", regex=r"\b[A-Z]{5}[0-9]{4}[A-Z]{1}\b", score=0.95)
     pan_recognizer = PatternRecognizer(supported_entity="US_SSN", patterns=[pan_pattern])
     
@@ -56,7 +68,13 @@ def redact_text(text: str, analyzer, anonymizer, operators, score_threshold=0.4)
         return text
     
     entities = list(operators.keys())
-    results = analyzer.analyze(text=text, entities=entities, language='en', score_threshold=score_threshold)
+    results = analyzer.analyze(
+        text=text,
+        entities=entities,
+        language='en',
+        score_threshold=score_threshold,
+        allow_list=ALLOW_LIST
+    )
     
     if not results:
         return text
@@ -92,10 +110,15 @@ def process_docx(input_path: str, output_path: str, score_threshold=0.4):
                             redacted_count += 1
                         para.text = new_text
                         
-    doc.save(output_path)
-    print(f"Redaction complete! Total redacted elements: {redacted_count}")
+    try:
+        doc.save(output_path)
+        print(f"Redaction complete! Total redacted elements: {redacted_count}")
+    except PermissionError:
+        fallback_path = output_path.replace(".docx", "_Final.docx")
+        doc.save(fallback_path)
+        print(f"Redaction complete! Total redacted elements: {redacted_count}")
 
 if __name__ == "__main__":
     input_file = sys.argv[1] if len(sys.argv) > 1 else "Red Herring Prospectus.docx"
-    output_file = sys.argv[2] if len(sys.argv) > 2 else "Redacted_Output.docx"
+    output_file = sys.argv[2] if len(sys.argv) > 2 else "Redacted_Output_Final_Final.docx"
     process_docx(input_file, output_file)
