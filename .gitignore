@@ -1,0 +1,18 @@
+# Python virtual environments & bytecode
+venv/
+env/
+ENV/
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Temporary uploads & output caches
+temp_files/
+temp_uploads/
+inspect_docx.py
+
+# IDE / OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
