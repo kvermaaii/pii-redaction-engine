@@ -134,10 +134,10 @@ Open `http://localhost:10000` in your browser to access the Drag & Drop Web UI, 
 ### 3. CLI Execution
 ```bash
 # Using uv
-uv run python redact.py "Red Herring Prospectus.docx" "Redacted_Output_Final_Final.docx"
+uv run python redact.py "Red Herring Prospectus.docx" "Redacted_Output.docx"
 
 # Or using standard python
-.\venv\Scripts\python.exe redact.py "Red Herring Prospectus.docx" "Redacted_Output_Final_Final.docx"
+.\venv\Scripts\python.exe redact.py "Red Herring Prospectus.docx" "Redacted_Output.docx"
 ```
 
 ### 3. Deploying to Render (Free Cloud Hosting)
